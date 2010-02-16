@@ -14,7 +14,7 @@ grant codeBase "file:${idea.launcher.bin.path}/../-" {
 };
 
 // for Maven
-grant codeBase "file:${user.home}/.m2/repository/-" {
+grant codeBase "file:${maven.repo.local}/-" {
     permission java.security.AllPermission;
 };
 
