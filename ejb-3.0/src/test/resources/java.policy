@@ -1,0 +1,28 @@
+// to allow access to private timeout methods
+grant codeBase "file:target/classes/-" {
+    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+// for cobertura
+grant codeBase "file:target/generated-classes/cobertura/-" {
+    permission java.security.AllPermission;
+};
+
+// for Intellij
+grant codeBase "file:${idea.launcher.bin.path}/../-" {
+    permission java.security.AllPermission;
+};
+
+// for Maven
+grant codeBase "file:${user.home}/.m2/repository/-" {
+    permission java.security.AllPermission;
+};
+
+grant codeBase "file:target/test-classes/-" {
+    permission java.security.AllPermission;
+};
+
+// either classes or the jar
+grant codeBase "file:../timeout-spi/target/-" {
+    permission java.security.AllPermission;
+};
