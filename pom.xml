@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <parent>
+      <groupId>org.jboss</groupId>
+      <artifactId>jboss-parent</artifactId>
+      <version>5-beta-5</version>
+   </parent>
+
    <modelVersion>4.0.0</modelVersion>
 
    <groupId>org.jboss.ejb3.timeout</groupId>
@@ -10,6 +16,8 @@
    <packaging>pom</packaging>
 
    <name>JBoss EJB 3 Timeout Requirements</name>
+
+   <url>http://www.jboss.org/ejb3</url>
 
    <build>
       <plugins>
@@ -50,6 +58,11 @@
       </dependencies>
    </dependencyManagement>
 
+   <issueManagement>
+      <system>jira</system>
+      <url>https://jira.jboss.org/jira/browse/EJBTHREE</url>
+   </issueManagement>
+
    <modules>
       <module>ejb-3.0</module>
       <module>ejb-3.1</module>
@@ -64,4 +77,10 @@
          </plugin>
       </plugins>
    </reporting>
+
+   <scm>
+      <connection>scm:git:git://github.com/wolfc/jboss-ejb3-timeout.git</connection>
+      <developerConnection>scm:git:git://github.com/wolfc/jboss-ejb3-timeout.git</developerConnection>
+      <url>http://github.com/wolfc/jboss-ejb3-timeout</url>
+   </scm>
 </project>
