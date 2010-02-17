@@ -27,7 +27,7 @@
          <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-               <argLine>-Djava.security.manager -Djava.security.policy=${basedir}/src/test/resources/java.policy -Djava.security.debug=failure,access</argLine>
+               <argLine>-Djava.security.manager -Djava.security.policy=${basedir}/src/test/resources/java.policy -Djava.security.debug=policy,failure,access -Dmaven.repo.local=${maven.repo.local}</argLine>
             </configuration>
          </plugin>
       </plugins>
