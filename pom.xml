@@ -3,7 +3,7 @@
    <parent>
       <groupId>org.jboss</groupId>
       <artifactId>jboss-parent</artifactId>
-      <version>5-beta-5</version>
+      <version>4</version>
    </parent>
 
    <modelVersion>4.0.0</modelVersion>
@@ -45,6 +45,7 @@
          </plugin>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
+            <version>2.0</version>
             <configuration>
                <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
@@ -89,7 +90,7 @@
 
    <scm>
       <connection>scm:git:git://github.com/wolfc/jboss-ejb3-timeout.git</connection>
-      <developerConnection>scm:git:git://github.com/wolfc/jboss-ejb3-timeout.git</developerConnection>
+      <developerConnection>scm:git:git@github.com:wolfc/jboss-ejb3-timeout.git</developerConnection>
       <url>http://github.com/wolfc/jboss-ejb3-timeout</url>
    </scm>
 </project>
