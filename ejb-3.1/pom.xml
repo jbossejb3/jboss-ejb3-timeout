@@ -38,7 +38,10 @@
          <groupId>${project.groupId}</groupId>
          <artifactId>jboss-ejb3-timeout-3.0</artifactId>
          <version>${project.version}</version>
+         <!-- MRELEASE-285
          <classifier>tests</classifier>
+         -->
+         <type>test-jar</type>
          <scope>test</scope>
          <exclusions>
             <exclusion>

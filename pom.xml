@@ -75,6 +75,11 @@
       <module>timeout-spi</module>
    </modules>
 
+   <properties>
+      <!-- per default maven.repo.local is null, so set up a sensible default -->
+      <maven.repo.local>${user.home}/.m2/repository</maven.repo.local>
+   </properties>
+
    <reporting>
       <plugins>
          <plugin>
