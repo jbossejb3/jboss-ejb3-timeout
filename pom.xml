@@ -70,9 +70,22 @@
 
    <modules>
       <module>ejb-3.0</module>
-      <module>ejb-3.1</module>
       <module>timeout-spi</module>
    </modules>
+
+   <!-- if we do '-P !ejb-3.1' do not build EJB 3.1 stuff -->
+   <profiles>
+      <profile>
+         <id>ejb-3.1</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+            <property><name>!dummy</name></property>
+         </activation>
+         <modules>
+            <module>ejb-3.1</module>
+         </modules>
+      </profile>
+   </profiles>
 
    <properties>
       <!-- per default maven.repo.local is null, so set up a sensible default -->
