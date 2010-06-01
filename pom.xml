@@ -73,13 +73,19 @@
       <module>timeout-spi</module>
    </modules>
 
+   <!-- By default we build all modules. -->
    <!-- if we do '-P !ejb-3.1' do not build EJB 3.1 stuff -->
+   <!-- When using 2.0.9 you can only have one profile active (bug),
+        so specifying -P ejb3.0 will give you only EJB 3.0 stuff.
+        When using 2.0.10+ you need to use -P !ejb-3.1 -->
    <profiles>
+      <profile>
+         <id>ejb-3.0</id>
+      </profile>
       <profile>
          <id>ejb-3.1</id>
          <activation>
             <activeByDefault>true</activeByDefault>
-            <property><name>!dummy</name></property>
          </activation>
          <modules>
             <module>ejb-3.1</module>
