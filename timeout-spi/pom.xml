@@ -17,5 +17,11 @@
          <version>3.0.0.GA_SP1</version>
          <scope>provided</scope>
       </dependency>
+      
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+      </dependency>
    </dependencies>
 </project>

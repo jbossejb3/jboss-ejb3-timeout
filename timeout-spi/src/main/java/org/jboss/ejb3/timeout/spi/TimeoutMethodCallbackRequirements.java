@@ -37,6 +37,28 @@ public interface TimeoutMethodCallbackRequirements
     * @param methodName
     * @return
     * @throws IllegalArgumentException
+    * @deprecated Use {@link #getTimeoutMethod(Class, String, Class[])} instead
     */
+   @Deprecated
    Method getTimeoutMethod(Class<?> beanClass, String methodName) throws IllegalArgumentException;
+   
+   /**
+    * Checks the passed <code>cls</code> for a method named <code>methodName</code> and whose
+    * parameters are of type <code>paramTypes</code>. If no such method is found on the <code>cls</code>
+    * then its superclass(es) are checked for the method, until the method is found or there's no more a
+    * superclass.
+    * <p>
+    *   The passed <code>paramTypes</code> can be null. In such a case, a method named <code>methodName</code>,
+    *   which doesn't accept any parameter, is searched for.   
+    * </p> 
+    * 
+    * @param klass The {@link Class} which is being checked for the method   
+    * @param methodName The timeout method name
+    * @param paramTypes The parameter types of the timeout method. Can be null
+    * @return Returns the method corresponding to the passed <code>methodName</code> and <code>paramTypes</code>.
+    *           If no such method is found, then returns null
+    * @throws IllegalArgumentException If the {@link Method} identified by this method doesn't follow the rules laid down
+    *           by the EJB3.x specification, for timeout methods
+    */
+   Method getTimeoutMethod(Class<?> klass, String methodName, Class<?>[] paramTypes) throws IllegalArgumentException;
 }

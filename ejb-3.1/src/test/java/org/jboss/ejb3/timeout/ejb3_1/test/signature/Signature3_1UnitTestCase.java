@@ -55,4 +55,13 @@ public class Signature3_1UnitTestCase
       Method expected = Bean1.class.getDeclaredMethod("timeout");
       assertEquals(expected, timeoutMethod);
    }
+   
+   @Test
+   public void testTimeoutMethod() throws Exception
+   {
+      Class<?> beanClass = Bean1.class;
+      Method timeoutMethod = requirements.getTimeoutMethod(beanClass, "timeout", null);
+      Method expected = Bean1.class.getDeclaredMethod("timeout");
+      assertEquals(expected, timeoutMethod);
+   }
 }

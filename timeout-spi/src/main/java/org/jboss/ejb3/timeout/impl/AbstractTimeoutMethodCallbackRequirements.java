@@ -21,12 +21,12 @@
  */
 package org.jboss.ejb3.timeout.impl;
 
-import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
+import java.lang.reflect.Method;
 
 import javax.ejb.TimedObject;
 import javax.ejb.Timer;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+
+import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
 
 /**
  * @author <a href="cdewolf@redhat.com">Carlo de Wolf</a>
@@ -48,7 +48,15 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
    }
 
    protected abstract void check(Method method);
-
+   
+   /**
+    * 
+    * @param cls
+    * @param methodName
+    * @return
+    * @deprecated Use {@link #findMethod(Class, String, Class[])}
+    */
+   @Deprecated
    private static Method findMethod(Class<?> cls, String methodName)
    {
       if(cls == null)
@@ -59,12 +67,88 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
       for(Method method : cls.getDeclaredMethods())
       {
          if(method.getName().equals(methodName))
+         {
             return method;
+         }
       }
 
       return findMethod(cls.getSuperclass(), methodName);
    }
 
+   /**
+    * Checks the passed <code>cls</code> for a method named <code>methodName</code> and whose
+    * parameters are of type <code>paramTypes</code>. If no such method is found on the <code>cls</code>
+    * then its superclass(es) are checked for the method, until the method is found or there's no more a
+    * superclass.
+    * <p>
+    *   The passed <code>paramTypes</code> can be null. In such a case, a method named <code>methodName</code>,
+    *   which doesn't accept any parameter, is searched for.   
+    * </p> 
+    * 
+    * 
+    * @param cls The {@link Class} which is being checked for the method  
+    * @param methodName The name of the method
+    * @param paramTypes The param types of the method. Can be null
+    * @return Returns the method corresponding to the passed <code>methodName</code> and <code>paramTypes</code>.
+    *           If no such method is found, then returns null
+    */
+   private static Method findMethod(Class<?> cls, String methodName, Class<?>[] paramTypes)
+   {
+      if(cls == null)
+         return null;
+
+      Class<?>[] methodParams = paramTypes;
+      if (methodParams == null)
+      {
+         methodParams = new Class<?>[0];
+      }
+      
+      // this is not the fastest way, but it ensures we get the method and can analyze it for errors
+      // if we were to do a search with parameter types, we might end up empty handed (no method, no error)
+      for(Method method : cls.getDeclaredMethods())
+      {
+         if(method.getName().equals(methodName))
+         {
+            if (paramsMatch(method.getParameterTypes(), methodParams))
+            {
+               return method;
+            }
+         }
+      }
+
+      return findMethod(cls.getSuperclass(), methodName, paramTypes);
+   }
+   
+   
+   private static boolean paramsMatch(Class<?>[] params, Class<?>[] otherParams)
+   {
+      if (params == null || otherParams == null)
+      {
+         return false;
+      }
+      
+      if (params.length != otherParams.length)
+      {
+         return false;
+      }
+      for (int i = 0; i < params.length; i++)
+      {
+         if (params[i] == null || otherParams[i] == null)
+         {
+            return false;
+         }
+         if (params[i].equals(otherParams[i]) == false)
+         {
+            return false;
+         }
+      }
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Method getTimeoutMethod(Class<?> beanClass, String methodName) throws IllegalArgumentException
    {
       if(TimedObject.class.isAssignableFrom(beanClass))
@@ -83,5 +167,29 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
       }
 
       return method;
-   }   
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Method getTimeoutMethod(java.lang.Class<?> beanClass, String methodName, java.lang.Class<?>[] paramTypes) throws IllegalArgumentException
+   {
+      if(TimedObject.class.isAssignableFrom(beanClass))
+      {
+         return EJB_TIMEOUT;
+      }
+
+      if(methodName == null)
+         return null;
+
+      Method method = findMethod(beanClass, methodName, paramTypes);
+      if(method != null)
+      {
+         check(method);
+         method.setAccessible(true);
+      }
+
+      return method;
+   }
 }
