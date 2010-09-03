@@ -23,16 +23,21 @@ package org.jboss.ejb3.timeout.impl;
 
 import java.lang.reflect.Method;
 
+
 import javax.ejb.TimedObject;
 import javax.ejb.Timer;
 
 import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public abstract class AbstractTimeoutMethodCallbackRequirements implements TimeoutMethodCallbackRequirements
 {
+   /** Logger */
+   private static final Logger logger = Logger.getLogger(AbstractTimeoutMethodCallbackRequirements.class);
+   
    protected static final Method EJB_TIMEOUT;
 
    static
@@ -47,7 +52,7 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
       }
    }
 
-   protected abstract void check(Method method);
+   protected abstract void check(Method method) throws IllegalArgumentException;
    
    /**
     * 
@@ -92,7 +97,7 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
     * @return Returns the method corresponding to the passed <code>methodName</code> and <code>paramTypes</code>.
     *           If no such method is found, then returns null
     */
-   private static Method findMethod(Class<?> cls, String methodName, Class<?>[] paramTypes)
+   private Method findMethod(Class<?> cls, String methodName, Class<?>[] paramTypes)
    {
       if(cls == null)
          return null;
@@ -118,7 +123,6 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
 
       return findMethod(cls.getSuperclass(), methodName, paramTypes);
    }
-   
    
    private static boolean paramsMatch(Class<?>[] params, Class<?>[] otherParams)
    {
@@ -147,7 +151,9 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
 
    /**
     * {@inheritDoc}
+    * @deprecated Use {@link #getTimeoutMethod(Class, String, Class[])} instead
     */
+   @Deprecated
    @Override
    public Method getTimeoutMethod(Class<?> beanClass, String methodName) throws IllegalArgumentException
    {
@@ -168,7 +174,7 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
 
       return method;
    }
-   
+
    /**
     * {@inheritDoc}
     */
@@ -181,15 +187,75 @@ public abstract class AbstractTimeoutMethodCallbackRequirements implements Timeo
       }
 
       if(methodName == null)
+      {
          return null;
+      }
+      
+      // if the param types are null, then it means find all methods with the specified
+      // timeout method name and then pick an eligible one (note, paramtTypes == null
+      // means that the timeout method may or may not accept params)
+      if (paramTypes == null)
+      {
+         return this.getTimeoutMethodWithName(beanClass, methodName);
+      }
 
+      // find the timeout method with the specified params types and method name
       Method method = findMethod(beanClass, methodName, paramTypes);
       if(method != null)
       {
+         // make sure it meets the timeout requirements
          check(method);
          method.setAccessible(true);
       }
 
       return method;
    }
+   
+   
+   /**
+    * Checks the passed <code>cls</code> for a method named <code>methodName</code>.
+    * Any method which matches the <code>methodName</code> is then checked for timeout method requirements. If that
+    * method meets the timeout method requirements, then that {@link Method} is returned back.
+    * <p>
+    * If no such method is found on the <code>cls</code>
+    * then its superclass(es) are checked for the method, until the method is found or there's no more a
+    * superclass.
+    * </p>
+    *  
+    * @param cls The {@link Class} which is being checked for the method  
+    * @param methodName The name of the method
+    * @return Returns the method matching the <code>methodName</code> and meeting the timeout method requirements. Null, otherwise.
+    */
+   private Method getTimeoutMethodWithName(Class<?> cls, String methodName)
+   {
+      if(cls == null || methodName == null)
+      {
+         return null;
+      }
+
+      // fetch the methods and compare the name
+      for(Method method : cls.getDeclaredMethods())
+      {
+         if(method.getName().equals(methodName))
+         {
+            try
+            {
+               // make sure it meets the timeout method requirements
+               this.check(method);
+               method.setAccessible(true);
+               // found a valid timeout method with the specifed name,
+               return method;
+            }
+            catch (IllegalArgumentException iae)
+            {
+               // ignore this method (and the exception) if the method
+               // doesn't match the timeout method requirements
+               logger.debug("Ignoring method: " + method + " since it doesn't meet the timeout method requirements");
+            }
+         }
+      }
+      // now try on super class
+      return getTimeoutMethodWithName(cls.getSuperclass(), methodName);
+   }
+   
 }

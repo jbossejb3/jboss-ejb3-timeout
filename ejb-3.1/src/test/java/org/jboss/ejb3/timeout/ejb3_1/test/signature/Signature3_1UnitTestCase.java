@@ -21,15 +21,16 @@
  */
 package org.jboss.ejb3.timeout.ejb3_1.test.signature;
 
-import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import javax.ejb.Timeout;
-import javax.imageio.spi.ServiceRegistry;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import javax.ejb.Timeout;
+import javax.ejb.Timer;
+import javax.imageio.spi.ServiceRegistry;
+
+import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
+import org.junit.Test;
 
 /**
  * @author <a href="cdewolf@redhat.com">Carlo de Wolf</a>
@@ -46,6 +47,30 @@ public class Signature3_1UnitTestCase
          
       }
    }
+   
+   private class Bean2
+   {
+      
+      // this one should be ignored
+      private void timeout(String blah)
+      {
+         
+      }
+      
+      // this one should be considered the
+      // timeout method
+      private void timeout(Timer timer)
+      {
+         
+      }
+      
+      // this one should be ignored
+      private void timeout(Timer timer, String blah)
+      {
+         
+      }
+       
+   }
 
    @Test
    public void test1() throws Exception
@@ -60,8 +85,25 @@ public class Signature3_1UnitTestCase
    public void testTimeoutMethod() throws Exception
    {
       Class<?> beanClass = Bean1.class;
-      Method timeoutMethod = requirements.getTimeoutMethod(beanClass, "timeout", null);
+      Method timeoutMethod = requirements.getTimeoutMethod(beanClass, "timeout", new Class<?>[0]);
       Method expected = Bean1.class.getDeclaredMethod("timeout");
       assertEquals(expected, timeoutMethod);
+   }
+   
+   /**
+    * Tests that the {@link TimeoutMethodCallbackRequirements} works correctly when the 
+    * timeout method name is specified and the param types is null. It's expected to 
+    * find the "correct" timeout method based on the method name (i.e. number of params to that timeout method 
+    * isn't known). 
+    * @throws Exception
+    */
+   @Test
+   public void testTimeoutMethodWithJustMethodName() throws Exception
+   {
+      Class<?> beanClass = Bean2.class;
+      Method timeoutMethod = requirements.getTimeoutMethod(beanClass, "timeout", null);
+      Method expected = Bean2.class.getDeclaredMethod("timeout", new Class<?>[] {Timer.class});
+      assertEquals("Unexpected timeout method", expected, timeoutMethod);
+
    }
 }

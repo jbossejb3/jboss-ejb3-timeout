@@ -48,8 +48,11 @@ public interface TimeoutMethodCallbackRequirements
     * then its superclass(es) are checked for the method, until the method is found or there's no more a
     * superclass.
     * <p>
-    *   The passed <code>paramTypes</code> can be null. In such a case, a method named <code>methodName</code>,
-    *   which doesn't accept any parameter, is searched for.   
+    *   The passed <code>paramTypes</code> can be null. In such a case, any methods named <code>methodName</code>,
+    *   will be looked for. Any such matching methods will then be checked to see if they meet the timeout method
+    *   requirements mandated by the spec. If the method meets the requirement, then that {@link Method} is returned.
+    *   If not, the superclass of the passed <code>cls</code> is scanned for such methods, until no method is found
+    *   or there's no more a superclass.   
     * </p> 
     * 
     * @param klass The {@link Class} which is being checked for the method   

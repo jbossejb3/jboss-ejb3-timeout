@@ -21,13 +21,12 @@
  */
 package org.jboss.ejb3.timeout.ejb3_0;
 
-import org.jboss.ejb3.timeout.impl.AbstractTimeoutMethodCallbackRequirements;
-import org.jboss.ejb3.timeout.spi.TimeoutMethodCallbackRequirements;
-
-import javax.ejb.TimedObject;
-import javax.ejb.Timer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+
+import javax.ejb.Timer;
+
+import org.jboss.ejb3.timeout.impl.AbstractTimeoutMethodCallbackRequirements;
 
 /**
  * EJB 3.0 FR 18.2.2 Timeout Callbacks.
